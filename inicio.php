@@ -1,7 +1,7 @@
 <?php
 	include 'database.php';	
 	session_start();
-	if(isset($_SESSION['usuario'])){
+	if(isset($_SESSION['id'])){
 		$database = new Database();
 		$pdo = $database->connect();
 ?>
@@ -66,7 +66,11 @@
 					<?php
 						$columnas = $pdo->query("SELECT COLUMN_NAME AS columna FROM information_schema.columns WHERE table_schema = '$database->dbNombre' AND table_name = '$tabla'")->fetchAll(PDO::FETCH_COLUMN);
 						foreach($columnas AS $campo=>$valor){
-							echo '<th>'.$valor.'</th>';
+                            if($valor === 'password'){
+                                continue;
+                            }else {
+                                echo '<th>'.$valor.'</th>';
+                            }
 						}
 					?>
 			  	</tr>
@@ -79,39 +83,36 @@
 						foreach ($tab as $campo=>$valor) {
 							echo '<tr>';
 							echo '<td>' . $valor['id'] . '</td>';
-							echo '<td>' . $valor['email'] . '</td>';
-							echo '<td>' . $valor['pass'] . '</td>';
+							echo '<td>' . $valor['name'] . '</td>';
+							echo '<td>' . $valor['last_name'] . '</td>';
 							echo '<td>' . $valor['phone'] . '</td>';
-							echo '<td>' . $valor['name_customer'] . '</td>';
-							echo '<td>' . $valor['adr_customer'] . '</td>';
+							echo '<td>' . $valor['address'] . '</td>';
+							echo '<td>' . $valor['users_id'] . '</td>';
 							echo '</tr>';
 						}
 					}else if($tabla==='dates'){
                         foreach ($tab as $campo=>$valor) {
                             echo '<tr>';
-                            echo '<td>' . $valor['cont_dates'] . '</td>';
-                            echo '<td>' . $valor['expediente'] . '</td>';
-                            echo '<td>' . $valor['license'] . '</td>';
-                            echo '<td>' . $valor['dt_DATES'] . '</td>';
-                            echo '<td>' . $valor['reason_appointment'] . '</td>';
                             echo '<td>' . $valor['id'] . '</td>';
+                            echo '<td>' . $valor['reason_appointment'] . '</td>';
+                            echo '<td>' . $valor['date'] . '</td>';
+                            echo '<td>' . $valor['cont_dates'] . '</td>';
+                            echo '<td>' . $valor['files_id'] . '</td>';
                             echo '</tr>';
                         }
 					}else if($tabla==='files'){
                         foreach ($tab as $campo=>$valor) {
                             echo '<tr>';
                             echo '<td>' . $valor['id'] . '</td>';
-                            echo '<td>' . $valor['expediente'] . '</td>';
+                            echo '<td>' . $valor['date_files'] . '</td>';
                             echo '<td>' . $valor['dsc_files'] . '</td>';
-                            echo '<td>' . $valor['date_file'] . '</td>';
                             echo '</tr>';
                         }
 					}else if($tabla==='pets'){
                         foreach ($tab as $campo=>$valor) {
                             echo '<tr>';
                             echo '<td>' . $valor['id'] . '</td>';
-                            echo '<td>' . $valor['expediente'] . '</td>';
-                            echo '<td>' . $valor['email'] . '</td>';
+                            echo '<td>' . $valor['files_id'] . '</td>';
                             echo '<td>' . $valor['name_pet'] . '</td>';
                             echo '<td>' . $valor['species'] . '</td>';
                             echo '<td>' . $valor['breed'] . '</td>';
@@ -120,22 +121,19 @@
 					}else if($tabla==='recipes'){
                         foreach ($tab as $campo=>$valor) {
                             echo '<tr>';
+                            echo '<td>' . $valor['id'] . '</td>';
                             echo '<td>' . $valor['cont_recipes'] . '</td>';
-                            echo '<td>' . $valor['expediente'] . '</td>';
                             echo '<td>' . $valor['dsc_recipes'] . '</td>';
                             echo '<td>' . $valor['date_recipe'] . '</td>';
-                            echo '<td>' . $valor['id'] . '</td>';
+                            echo '<td>' . $valor['files_id'] . '</td>';
                             echo '</tr>';
                         }
 					}else {
 						foreach ($tab as $campo=>$valor) {
 							echo '<tr>';
-							echo '<td>' . $valor['license'] . '</td>';
-							echo '<td>' . $valor['name_user'] . '</td>';
-							echo '<td>' . $valor['pass'] . '</td>';
-							echo '<td>' . $valor['phone'] . '</td>';
-							echo '<td>' . $valor['adr_user'] . '</td>';
-                            echo '<td>' . $valor['id'] . '</td>';
+							echo '<td>' . $valor['id'] . '</td>';
+							echo '<td>' . $valor['email'] . '</td>';
+							echo '<td>' . $valor['type_user'] . '</td>';
 							echo '</tr>';
 						}
 					}

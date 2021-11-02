@@ -1,7 +1,7 @@
 <?php
 	include 'database.php';	
 	session_start();
-	if(isset($_SESSION['usuario'])){
+	if(isset($_SESSION['id'])){
 		$database = new Database();
 		$pdo = $database->connect();
 		$columnas = $pdo->query("SELECT COLUMN_NAME AS columna FROM information_schema.columns WHERE table_schema = '$database->dbNombre' AND table_name = '$_GET[tabla]'")->fetchAll(PDO::FETCH_ASSOC);
@@ -73,7 +73,7 @@
 				<tr>
 					<?php
 						foreach($columnas AS $campo=>$valor){
-							if($_GET['tabla']==="users" && $valor['columna'] === "pass"){
+							if($_GET['tabla']==="users" && $valor['columna'] === "password"){
 								continue;
 							}else{
 								echo '<th>'.$valor['columna'].'</th>';
@@ -106,7 +106,7 @@
 							echo '<tr>';
 								$res='';
 								foreach ($valor as $cam => $val) {
-									if($_GET['tabla']==="users" && $cam === "pass"){
+									if($_GET['tabla']==="users" && $cam === "password"){
 										continue;
 									}else{
 										$res .= '<td>' . $val . '</td>';

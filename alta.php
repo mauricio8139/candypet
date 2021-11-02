@@ -1,13 +1,13 @@
 <?php
 	include 'database.php';	
 	session_start();
-	if(isset($_SESSION['usuario'])){
+	if(isset($_SESSION['id'])){
 		$database = new Database();
 		$pdo = $database->connect();
 		$columnas = $pdo->query("SELECT COLUMN_NAME AS columna, COLUMN_TYPE AS tipo FROM information_schema.columns WHERE table_schema = '$database->dbNombre' AND table_name = '$_GET[tabla]'")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="">
 <head>
 	<title>Proyecto Base de Datos</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css" >
@@ -54,9 +54,20 @@
 								<div class="col-md-3">
 								    <label class="des_alta" for="fname">Inserta '.$valor['columna'].' :</label>
 								</div>';
-						echo '<div class="col-md-8"> 
+                        if(strpos($valor['columna'], 'id')){
+                            $res = strstr($valor['columna'], '_id', true);
+                            $sql='SELECT * FROM '.$res;
+                            $tabla = $pdo->query($sql)->fetchALL(PDO::FETCH_ASSOC);
+                            echo '<div class="col-md-8"> <select class="alta" name="'.$valor['columna'].'">';
+                                foreach ($tabla as $reg){
+                                    echo '<option value="' . $reg['id'] . '">' . $reg['id'] . '</option>';
+                                }
+				            echo '</select> </div> </div>';
+                        }else{
+                            echo '<div class="col-md-8"> 
 									<input class="alta" id="fname" type="text" placeholder="'.$valor['columna'].'" name="'.$valor['columna'].'">
 								</div></div>';
+                        }
 					}
 				}
 			?>

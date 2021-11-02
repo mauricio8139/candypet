@@ -1,7 +1,7 @@
 <?php
 	include 'database.php';	
 	session_start();
-	if(isset($_SESSION['usuario'])){
+	if(isset($_SESSION['id'])){
 		$database = new Database();
 		$pdo = $database->connect();
 		$columnas = $pdo->query("SELECT COLUMN_NAME AS columna FROM information_schema.columns WHERE table_schema = '$database->dbNombre' AND table_name = '$_GET[tabla]'")->fetchAll(PDO::FETCH_ASSOC);
