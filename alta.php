@@ -48,7 +48,7 @@
 	<div class="col-md-12">
         <?php
             if($_GET['tabla'] === 'recipes'){
-                echo '<form method="post" action="correo.php">';
+                echo '<form method="post" action="">';
             }else{
                 echo '<form method="post">';
             }
