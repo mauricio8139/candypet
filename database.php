@@ -1,6 +1,6 @@
 <?php
 class Database {
-	public $dbNombre = 'veterinaria';
+	public $dbNombre = 'veterinaria_2';
 	public $dbHost = 'localhost';
 	public $dbUser = 'root';
 	public $dbUserPass = 'Karate001.';

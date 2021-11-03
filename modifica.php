@@ -1,15 +1,15 @@
 <?php
 	include 'database.php';	
 	session_start();
-	if(isset($_SESSION['usuario'])){
+	if(isset($_SESSION['id'])){
 		$database = new Database();
 		$pdo = $database->connect();
 		$columnas = $pdo->query("SELECT COLUMN_NAME AS columna FROM information_schema.columns WHERE table_schema = '$database->dbNombre' AND table_name = '$_GET[tabla]'")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="">
 <head>
-	<title>Proyecto Base de Datos</title>
+	<title>CandyPet</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css" >
 	<link rel="stylesheet" href="css/style.css" >
 </head>
@@ -20,21 +20,23 @@
                 <?php
                 $tablas = $pdo->query("SELECT table_name AS nombre FROM information_schema.tables WHERE table_schema = '$database->dbNombre';")->fetchAll(PDO::FETCH_COLUMN);
                 foreach($tablas AS $tabla){
-                    if($tabla==='customer'){
+                    if($tabla==='customer' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Cliente</a>';
-                    }else if($tabla==='dates'){
+                    }else if($tabla==='dates' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Citas</a>';
-                    }else if($tabla==='files'){
+                    }else if($tabla==='files' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Archivos</a>';
-                    }else if($tabla==='pets'){
+                    }else if($tabla==='pets' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Mascotas</a>';
                     }else if($tabla==='recipes'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Recetas</a>';
-                    }else {
+                    }else if($tabla==='users' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Usuario</a>';
                     }
                     echo '<div class="dropdown-content">';
-                    echo '<a class="stl_accion" href="alta.php?tabla='.$tabla.'">Alta</a>';
+                    if($_SESSION['tipo'] === 'administrador'){
+                        echo '<a class="stl_accion" href="alta.php?tabla='.$tabla.'">Alta</a>';
+                    }
                     echo '<a class="stl_accion" href="lista.php?tabla='.$tabla.'">Lista</a>';
                     echo '</div></li>';
                 }
@@ -46,112 +48,48 @@
 	<div class="col-md-12">
 		<form method="post">
 			<?php
-				if(empty($_POST)){
-					if($_GET['tabla'] === 'departamento'){
-						$campos = $pdo->query("SELECT * FROM $_GET[tabla] WHERE NUMEROD = $_GET[NUMEROD]")->fetch(PDO::FETCH_ASSOC);
-						foreach ($campos as $campo => $valor) {
-							if($campo!=='id'){
-								echo '<div class="row">
-									    <div class="col-md-3">
-									      	<label class="des_alta" for="fname">Inserta '.$campo.' :</label>
-									    </div>';
-								echo '<div class="col-md-9"> 
-										<input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
-									</div></div>';
-							}
-						}
-					}else if($_GET['tabla'] === 'dependiente'){	
-						$campos = $pdo->query("SELECT * FROM $_GET[tabla] WHERE NSSE = $_GET[NSSE] AND NOMBRE_DEPENDIENTE = '$_GET[NOMBRE_DEPENDIENTE]'")->fetch(PDO::FETCH_ASSOC);
-						foreach ($campos as $campo => $valor) {
-							if($campo!=='id'){
-								echo '<div class="row">
-									    <div class="col-md-3">
-									      	<label class="des_alta" for="fname">Inserta '.$campo.':</label>
-									    </div>';
-								echo '<div class="col-md-9"> 
-										<input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
-									</div></div>';
-							}
-						}
-					}else if($_GET['tabla'] === 'empleado'){
-						$campos = $pdo->query("SELECT * FROM $_GET[tabla] WHERE NSS = $_GET[NSS]")->fetch(PDO::FETCH_ASSOC);
-						foreach ($campos as $campo => $valor) {
-							if($campo!=='id'){
-								echo '<div class="row">
-									    <div class="col-md-3">
-									      	<label class="des_alta" for="fname">Inserta '.$campo.':</label>
-									    </div>';
-								echo '<div class="col-md-9"> 
-										<input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
-									</div></div>';
-							}
-						}
-					}else if($_GET['tabla'] === 'lugares_deptos'){
-						$campos = $pdo->query("SELECT * FROM $_GET[tabla] WHERE NUMEROD = $_GET[NUMEROD] AND LUGARD = '$_GET[LUGARD]'")->fetch(PDO::FETCH_ASSOC);
-						foreach ($campos as $campo => $valor) {
-							if($campo!=='id'){
-								echo '<div class="row">
-									    <div class="col-md-3">
-									      	<label class="des_alta" for="fname">Inserta '.$campo.':</label>
-									    </div>';
-								echo '<div class="col-md-9"> 
-										<input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
-									</div></div>';
-							}
-						}
-					}else if($_GET['tabla'] === 'proyecto'){
-						$campos = $pdo->query("SELECT * FROM $_GET[tabla] WHERE NUMEROP = $_GET[NUMEROP]")->fetch(PDO::FETCH_ASSOC);
-						foreach ($campos as $campo => $valor) {
-							if($campo!=='id'){
-								echo '<div class="row">
-									    <div class="col-md-3">
-									      	<label class="des_alta" for="fname">Inserta '.$campo.':</label>
-									    </div>';
-								echo '<div class="col-md-9"> 
-										<input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
-									</div></div>';
-							}
-						}
-					}else if($_GET['tabla'] === 'trabaja_en'){
-						$campos = $pdo->query("SELECT * FROM $_GET[tabla] WHERE NSSE = $_GET[NSSE] AND NUMEROD = $_GET[NUMEROD] AND FECHAINICGTE  = $_GET[FECHAINICGTE]")->fetch(PDO::FETCH_ASSOC);
-						foreach ($campos as $campo => $valor) {
-							if($campo!=='id'){
-								echo '<div class="row">
-									    <div class="col-md-3">
-									      	<label class="des_alta" for="fname">Inserta '.$campo.':</label>
-									    </div>';
-								echo '<div class="col-md-9"> 
-										<input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
-									</div></div>';
-							}
-						}
-					}else {
-						$campos = $pdo->query("SELECT * FROM $_GET[tabla] WHERE id = $_GET[id]")->fetch(PDO::FETCH_ASSOC);
-						foreach ($campos as $campo => $valor) {
-							if($campo!=='id'){
-								echo '<div class="row">
-									    <div class="col-md-3">
-									      	<label class="des_alta" for="fname">Inserta '.$campo.':</label>
-									    </div>';
-								echo '<div class="col-md-9"> 
-										<input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
-									</div></div>';
-							}
-						}
-					}
-				}else{
-					foreach ($_POST as $campo => $valor) {
-						if($campo!=='id'){
-							echo '<div class="row">
-								    <div class="col-md-3">
-								      	<label class="des_alta" for="fname">Inserta '.$campo.':</label>
-								    </div>';
-							echo '<div class="col-md-9"> 
-									<input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
-								</div></div>';
-						}
-					}
-				}
+                if(empty($_POST)){
+                    $campos = $pdo->query("SELECT * FROM $_GET[tabla] WHERE id = $_GET[id]")->fetch(PDO::FETCH_ASSOC);
+                    foreach ($campos as $campo => $valor) {
+                        if ($campo !== 'id') {
+                            echo '<div class="row">
+                                        <div class="col-md-3">
+                                            <label class="des_alta" for="fname">Inserta ' . $campo . ':</label>
+                                        </div>';
+
+                            if(strpos($campo, 'id')){
+                                $res = strstr($campo, '_id', true);
+                                $sql='SELECT * FROM '.$res;
+                                $tabla = $pdo->query($sql)->fetchALL(PDO::FETCH_ASSOC);
+                                echo '<div class="col-md-8"> <select class="alta" name="'.$campo.'">';
+                                foreach ($tabla as $reg){
+                                    if($reg['id']===$valor){
+                                        echo '<option selected="selected" value="' . $reg['id'] . '">' . $reg['id'] . '</option>';
+                                    }else {
+                                        echo '<option value="' . $reg['id'] . '">' . $reg['id'] . '</option>';
+                                    }
+                                }
+                                echo '</select> </div> </div>';
+                            }else{
+                                echo '<div class="col-md-9"> 
+                                        <input class="alta" id="fname" type="text" placeholder="' . $campo . '" name="' . $campo . '" value="' . $valor . '">
+                                    </div></div>';
+                            }
+                        }
+                    }
+                }else{
+                    foreach ($_POST as $campo => $valor) {
+                        if($campo!=='id'){
+                            echo '<div class="row">
+                                        <div class="col-md-3">
+                                            <label class="des_alta" for="fname">Inserta '.$campo.':</label>
+                                        </div>';
+                            echo '<div class="col-md-9"> 
+                                        <input class="alta" id="fname" type="text" placeholder="'.$campo.'" name="'.$campo.'" value="'.$valor.'">
+                                    </div></div>';
+                        }
+                    }
+                }
 			?>
 		  	<button class="btn_alta" type="submit">Guardar</button>
 		 </form>

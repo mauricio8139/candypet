@@ -928,3 +928,22 @@ button[type=submit]:hover {
 .accion:hover{
 
 }
+
+.input_registro{
+    width: 100%;
+}
+
+.button_registro{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.ocultar {
+    display: none;
+}
+
+.mostrar {
+    display: block;
+}
