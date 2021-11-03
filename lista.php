@@ -20,21 +20,23 @@
                 <?php
                 $tablas = $pdo->query("SELECT table_name AS nombre FROM information_schema.tables WHERE table_schema = '$database->dbNombre';")->fetchAll(PDO::FETCH_COLUMN);
                 foreach($tablas AS $tabla){
-                    if($tabla==='customer'){
+                    if($tabla==='customer' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Cliente</a>';
-                    }else if($tabla==='dates'){
+                    }else if($tabla==='dates' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Citas</a>';
-                    }else if($tabla==='files'){
+                    }else if($tabla==='files' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Archivos</a>';
-                    }else if($tabla==='pets'){
+                    }else if($tabla==='pets' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Mascotas</a>';
                     }else if($tabla==='recipes'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Recetas</a>';
-                    }else {
+                    }else if($tabla==='users' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Usuario</a>';
                     }
                     echo '<div class="dropdown-content">';
-                    echo '<a class="stl_accion" href="alta.php?tabla='.$tabla.'">Alta</a>';
+                    if($_SESSION['tipo'] === 'administrador'){
+                        echo '<a class="stl_accion" href="alta.php?tabla='.$tabla.'">Alta</a>';
+                    }
                     echo '<a class="stl_accion" href="lista.php?tabla='.$tabla.'">Lista</a>';
                     echo '</div></li>';
                 }
@@ -79,9 +81,11 @@
 								echo '<th>'.$valor['columna'].'</th>';
 							}
 						}
-					?>
-					<th>Modifica</th>
-					<th>Elimina</th>
+                        if ($_SESSION['tipo']==='administrador'){
+                            echo '<th>Modifica</th>';
+                            echo '<th>Elimina</th>';
+                        }
+                    ?>
 			  	</tr>
 			</thead>
 
@@ -98,7 +102,14 @@
 						$sql = trim($sql, 'AND ');
 						$tabla = $pdo->query($sql)->fetchALL(PDO::FETCH_ASSOC);
 					}else{
-						$tabla = $pdo->query("SELECT * FROM $_GET[tabla]")->fetchALL(PDO::FETCH_ASSOC);
+                        if($_SESSION['tipo'] === 'administrador'){
+                            $tabla = $pdo->query("SELECT * FROM $_GET[tabla]")->fetchALL(PDO::FETCH_ASSOC);
+                        }else{
+                            $user = $pdo->query("SELECT * FROM users WHERE id =".$_SESSION['id'])->fetchALL(PDO::FETCH_ASSOC);
+                            $customer = $pdo->query("SELECT * FROM customer WHERE users_id =".$user[0]['id'])->fetchALL(PDO::FETCH_ASSOC);
+                            $pet = $pdo->query("SELECT * FROM pets WHERE customer_id =".$customer[0]['id'])->fetchALL(PDO::FETCH_ASSOC);
+                            $tabla = $pdo->query("SELECT * FROM recipes WHERE files_id =".$pet[0]['files_id'])->fetchALL(PDO::FETCH_ASSOC);
+                        }
 					}
 					
 					if(count($tabla)>0){
@@ -113,12 +124,14 @@
 									}
 								}
 								echo $res;
-                                echo '<td>';
-                                echo '<a class="accion" href="modifica.php?tabla='.$_GET['tabla'].'&id='.$valor['id'].'">Modifica</a>';
-                                echo '</td>';
-                                echo '<td>';
-                                echo '<a class="accion" href="elimina.php?tabla='.$_GET['tabla'].'&id='.$valor['id'].'">Borra</a>';
-                                echo '</td>';
+                                if ($_SESSION['tipo']==='administrador'){
+                                    echo '<td>';
+                                    echo '<a class="accion" href="modifica.php?tabla='.$_GET['tabla'].'&id='.$valor['id'].'">Modifica</a>';
+                                    echo '</td>';
+                                    echo '<td>';
+                                    echo '<a class="accion" href="elimina.php?tabla='.$_GET['tabla'].'&id='.$valor['id'].'">Borra</a>';
+                                    echo '</td>';
+                                }
 							echo '</tr>';
 						}
 					}
