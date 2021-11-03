@@ -1,7 +1,7 @@
 <?php
 	include 'database.php';	
 	session_start();
-	if(isset($_SESSION['usuario'])){
+	if(isset($_SESSION['id'])){
 		$database = new Database();
 		$tabla = $_GET['tabla'];
 	    $id = $_GET['id'];

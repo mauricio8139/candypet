@@ -96,8 +96,8 @@ if($user_ok) {
         $mail->AltBody = $mensaje;
 
         $mail->send();
-        echo 'El mensaje ha sido enviado';
-        exit;
+
+        header('Location: alta.php?tabla=recipes');
     } catch (Exception $e) {
         echo "Error: {$mail->ErrorInfo}";
     }

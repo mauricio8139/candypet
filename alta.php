@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html lang="">
 <head>
-	<title>Proyecto Base de Datos</title>
+	<title>CandyPet</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css" >
 	<link rel="stylesheet" href="css/style.css" >
 </head>
