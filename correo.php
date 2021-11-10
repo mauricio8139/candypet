@@ -14,6 +14,16 @@ if(!empty($_POST)){
     $pdo = $database->connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    $tabla = $pdo->query("SELECT * FROM recipes WHERE files_id = $_POST[files_id]")->fetchALL(PDO::FETCH_ASSOC);
+
+    $inicio = 0;
+    foreach ($tabla as $val){
+        if($inicio < $val['cont_recipes']){
+            $inicio = $val['cont_recipes'];
+        }
+    }
+    $_POST['cont_recipes']=$inicio+1;
+
     $sql="INSERT INTO recipes (";
     foreach ($_POST as $campo => $valor) {
         $sql.= $campo.", ";
@@ -83,7 +93,7 @@ if($user_ok) {
         $mail->Host = 'smtp.gmail.com';                     //Set the SMTP server to send through
         $mail->SMTPAuth = true;                                   //Enable SMTP authentication
         $mail->Username = 'mauricio.hernandez8139@alumnos.udg.mx';                     //SMTP username
-        $mail->Password = '.UdeG-57692';                               //SMTP password
+        $mail->Password = 'Moro1983582001.';                               //SMTP password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;         //Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
         $mail->Port = 465;                                    //TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 

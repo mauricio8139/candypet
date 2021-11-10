@@ -35,7 +35,7 @@
                     }
                     echo '<div class="dropdown-content">';
                     if($_SESSION['tipo'] === 'administrador'){
-                        echo '<a class="stl_accion" href="alta.php?tabla='.$tabla.'">Alta</a>';
+                        echo '<a class="stl_accion" href="alta_'.$tabla.'.php?tabla='.$tabla.'">Alta</a>';
                     }
                     echo '<a class="stl_accion" href="lista.php?tabla='.$tabla.'">Lista</a>';
                     echo '</div></li>';
@@ -126,7 +126,7 @@
 								echo $res;
                                 if ($_SESSION['tipo']==='administrador'){
                                     echo '<td>';
-                                    echo '<a class="accion" href="modifica.php?tabla='.$_GET['tabla'].'&id='.$valor['id'].'">Modifica</a>';
+                                    echo '<a class="accion" href="modifica_'.$_GET['tabla'].'.php?tabla='.$_GET['tabla'].'&id='.$valor['id'].'">Modifica</a>';
                                     echo '</td>';
                                     echo '<td>';
                                     echo '<a class="accion" href="elimina.php?tabla='.$_GET['tabla'].'&id='.$valor['id'].'">Borra</a>';

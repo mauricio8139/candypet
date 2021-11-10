@@ -13,12 +13,12 @@
 	<link rel="stylesheet" href="css/style.css" >
 </head>
 <body>
-	<div class="col-md-12">
-		<ul class="menu_sis">
-			<li><a href="inicio.php" class="dropbtn obj_list">Inicio</a>
-			<?php
-				$tablas = $pdo->query("SELECT table_name AS nombre FROM information_schema.tables WHERE table_schema = '$database->dbNombre';")->fetchAll(PDO::FETCH_COLUMN);
-				foreach($tablas AS $tabla){
+    <div class="col-md-12">
+        <ul class="menu_sis">
+            <li><a href="inicio.php" class="dropbtn obj_list">Inicio</a>
+                <?php
+                $tablas = $pdo->query("SELECT table_name AS nombre FROM information_schema.tables WHERE table_schema = '$database->dbNombre';")->fetchAll(PDO::FETCH_COLUMN);
+                foreach($tablas AS $tabla){
                     if($tabla==='customer' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Cliente</a>';
                     }else if($tabla==='dates' && $_SESSION['tipo'] === 'administrador'){
@@ -34,15 +34,15 @@
                     }
                     echo '<div class="dropdown-content">';
                     if($_SESSION['tipo'] === 'administrador'){
-                        echo '<a class="stl_accion" href="alta.php?tabla='.$tabla.'">Alta</a>';
+                        echo '<a class="stl_accion" href="alta_'.$tabla.'.php?tabla='.$tabla.'">Alta</a>';
                     }
                     echo '<a class="stl_accion" href="lista.php?tabla='.$tabla.'">Lista</a>';
                     echo '</div></li>';
-				}
-			?>
-			<li><a href="salir.php" class="dropbtn obj_list">Cerrar Session</a>
-		</ul>
-	</div>
+                }
+                ?>
+            <li><a href="salir.php" class="dropbtn obj_list">Cerrar Session</a>
+        </ul>
+    </div>
 	<div class="col-md-12">
 		<?php
 			$tablas = $pdo->query("SELECT table_name AS nombre FROM information_schema.tables WHERE table_schema = '$database->dbNombre';")->fetchAll(PDO::FETCH_COLUMN);
