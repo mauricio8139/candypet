@@ -5,6 +5,17 @@ if(isset($_SESSION['id'])){
     $database = new Database();
     $pdo = $database->connect();
     $files = $pdo->query("SELECT * FROM files")->fetchALL(PDO::FETCH_ASSOC);
+    $times = $pdo->query("SELECT * FROM time")->fetchALL(PDO::FETCH_ASSOC);
+    $dates = $pdo->query("SELECT * FROM dates")->fetchALL(PDO::FETCH_ASSOC);
+    foreach ($times as $key => $time){
+        foreach ($dates as $date){
+            $cita = date('Y-m-d').' '.$time['time'];
+            if($cita === $date['date']) {
+                unset($times[$key]);
+            }
+        }
+    }
+    $fecha_actual = date('Y-m-d');
     ?>
     <!DOCTYPE html>
     <html lang="">
@@ -17,6 +28,7 @@ if(isset($_SESSION['id'])){
                     const reason_appointment = document.getElementById("reason_appointment");
                     const date = document.getElementById("date");
                     const cont_dates = document.getElementById("cont_dates");
+                    const time = document.getElementById("time");
 
                     if(reason_appointment.value==="") {
                         reason_appointment.setCustomValidity("Campo razon de cita no puede venir vacio");
@@ -33,7 +45,13 @@ if(isset($_SESSION['id'])){
                     if(cont_dates.value==="") {
                         cont_dates.setCustomValidity("Campo apellido no puede venir vacio");
                     }else{
-                        cont_dates.setCustomValidity("");
+                           cont_dates.setCustomValidity("");
+                    }
+
+                    if(time.value==="") {
+                        time.setCustomValidity("Campo horario no debe de venir vacio");
+                    }else{
+                        time.setCustomValidity("");
                     }
                 }
             </script>
@@ -47,7 +65,7 @@ if(isset($_SESSION['id'])){
                         foreach($tablas AS $tabla){
                             if($tabla==='customer' && $_SESSION['tipo'] === 'administrador'){
                                 echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Cliente</a>';
-                            }else if($tabla==='dates' && $_SESSION['tipo'] === 'administrador'){
+                            }else if($tabla==='dates'){
                                 echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Citas</a>';
                             }else if($tabla==='files' && $_SESSION['tipo'] === 'administrador'){
                                 echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Archivos</a>';
@@ -60,6 +78,8 @@ if(isset($_SESSION['id'])){
                             }
                             echo '<div class="dropdown-content">';
                             if($_SESSION['tipo'] === 'administrador'){
+                                echo '<a class="stl_accion" href="alta_'.$tabla.'.php?tabla='.$tabla.'">Alta</a>';
+                            }else if($tabla==='dates' && $_SESSION['tipo'] === 'basico'){
                                 echo '<a class="stl_accion" href="alta_'.$tabla.'.php?tabla='.$tabla.'">Alta</a>';
                             }
                             echo '<a class="stl_accion" href="lista.php?tabla='.$tabla.'">Lista</a>';
@@ -80,30 +100,37 @@ if(isset($_SESSION['id'])){
                            <input class="alta" id="reason_appointment" type="text" placeholder="Razon" name="reason_appointment">
                        </div>
                         <div class="col-md-3">
-                            <label class="des_alta" for="fname">Inserta fecha:</label>
+                            <label class="des_alta" for="fname">Selecciona horario:</label>
                         </div>
                         <div class="col-md-8">
-                            <input class="alta" id="date" type="date" name="date">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="des_alta" for="fname">Inserta numero de citas:</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input class="alta" id="cont_dates" type="text" placeholder="Contador" name="cont_dates">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="des_alta" for="fname">Selecciona expediente:</label>
-                        </div>
-                        <div class="col-md-8">
-                            <select class="alta" id="files_id" name="files_id">
+                            <select class="alta" id="time" name="time">
                                 <?php
-                                    foreach ($files as $file){
-                                        echo '<option value="'.$file['id'].'">'.$file['id'].' '.$file['dsc_files'].'</option>';
-                                    }
+                                foreach ($times as $time){
+                                    echo '<option value="'.$time['time'].'">'.$time['dsc_time'].'</option>';
+                                }
                                 ?>
                             </select>
                         </div>
+                        <div class="col-md-3">
+                            <label class="des_alta" for="fname">Inserta fecha:</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input class="alta" id="date" type="date" name="date" value="<?php echo $fecha_actual; ?>">
+                        </div>
+                        <?php if($_SESSION['tipo'] === 'administrador'){?>
+                            <div class="col-md-3">
+                                <label class="des_alta" for="fname">Selecciona expediente:</label>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="alta" id="files_id" name="files_id">
+                                    <?php
+                                        foreach ($files as $file){
+                                            echo '<option value="'.$file['id'].'">'.$file['id'].' '.$file['dsc_files'].'</option>';
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                        <?php }?>
                         <div class="col-md-12">
                             <button class="btn_alta" type="submit" onclick="valida_datos()">Guardar</button>
                         </div>
@@ -113,6 +140,17 @@ if(isset($_SESSION['id'])){
     </html>
     <?php
     if(!empty($_POST)){
+
+        $user = $pdo->query("SELECT * FROM users WHERE id =".$_SESSION['id'])->fetchALL(PDO::FETCH_ASSOC);
+        $customer = $pdo->query("SELECT * FROM customer WHERE users_id =".$user[0]['id'])->fetchALL(PDO::FETCH_ASSOC);
+        $pet = $pdo->query("SELECT * FROM pets WHERE customer_id =".$customer[0]['id'])->fetchALL(PDO::FETCH_ASSOC);
+
+        $_POST['files_id'] = $pet[0]['files_id'];
+
+        $_POST['date']= $_POST['date'].' '.$_POST['time'];
+        if(isset($_POST['time']))
+            unset($_POST['time']);
+
         $database = new Database();
         $pdo = $database->connect();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

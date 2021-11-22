@@ -22,7 +22,7 @@
                 foreach($tablas AS $tabla){
                     if($tabla==='customer' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Cliente</a>';
-                    }else if($tabla==='dates' && $_SESSION['tipo'] === 'administrador'){
+                    }else if($tabla==='dates'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Citas</a>';
                     }else if($tabla==='files' && $_SESSION['tipo'] === 'administrador'){
                         echo '<li class="dropdown"><a href="javascript:void(0)" class="dropbtn obj_list">Archivos</a>';
@@ -35,6 +35,8 @@
                     }
                     echo '<div class="dropdown-content">';
                     if($_SESSION['tipo'] === 'administrador'){
+                        echo '<a class="stl_accion" href="alta_'.$tabla.'.php?tabla='.$tabla.'">Alta</a>';
+                    }else if($tabla==='dates' && $_SESSION['tipo'] === 'basico'){
                         echo '<a class="stl_accion" href="alta_'.$tabla.'.php?tabla='.$tabla.'">Alta</a>';
                     }
                     echo '<a class="stl_accion" href="lista.php?tabla='.$tabla.'">Lista</a>';
@@ -104,6 +106,11 @@
 					}else{
                         if($_SESSION['tipo'] === 'administrador'){
                             $tabla = $pdo->query("SELECT * FROM $_GET[tabla]")->fetchALL(PDO::FETCH_ASSOC);
+                        }else if($_SESSION['tipo'] === 'basico' && $_GET['tabla'] === 'dates'){
+                            $user = $pdo->query("SELECT * FROM users WHERE id =".$_SESSION['id'])->fetchALL(PDO::FETCH_ASSOC);
+                            $customer = $pdo->query("SELECT * FROM customer WHERE users_id =".$user[0]['id'])->fetchALL(PDO::FETCH_ASSOC);
+                            $pet = $pdo->query("SELECT * FROM pets WHERE customer_id =".$customer[0]['id'])->fetchALL(PDO::FETCH_ASSOC);
+                            $tabla = $pdo->query("SELECT * FROM dates WHERE files_id =".$pet[0]['files_id'])->fetchALL(PDO::FETCH_ASSOC);
                         }else{
                             $user = $pdo->query("SELECT * FROM users WHERE id =".$_SESSION['id'])->fetchALL(PDO::FETCH_ASSOC);
                             $customer = $pdo->query("SELECT * FROM customer WHERE users_id =".$user[0]['id'])->fetchALL(PDO::FETCH_ASSOC);
